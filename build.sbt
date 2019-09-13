@@ -24,7 +24,7 @@ lazy val squants =
       osgiSettings,
       scalacOptions in Tut --= Seq("-Ywarn-unused-import", "-Ywarn-unused:imports"),
       tutTargetDirectory := file("."),
-      tutSourceDirectory := file(".") / "src" / "main" / "tut"
+      tutSourceDirectory := file("shared") / "src" / "main" / "tut"
     )
     .jvmSettings(Tests.defaultSettings: _*)
     .jsSettings(Tests.defaultSettings: _*)

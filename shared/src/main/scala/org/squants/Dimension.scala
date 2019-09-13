@@ -2,7 +2,11 @@ package org.squants
 
 import scala.util.{Failure, Success, Try}
 
+import scala.language.higherKinds
+
 trait Dimension {
+
+  type Q[N] <: Quantity[this.type, N]
 
   /**
    * The name
@@ -47,24 +51,24 @@ trait Dimension {
    * @param value the source string (ie, "10 kW") or tuple (ie, (10, "kW"))
    * @return Try[A]
    */
-  protected def parse[N: SquantsNumeric](value: String): Try[Quantity[Dimension.this.type, N]] = parseString(value)
-  protected def parse[N: SquantsNumeric](value: (N, String)): Try[Quantity[this.type, N]] = parseTuple(value._1, value._2)
+  protected def parse[N: SquantsNumeric](value: String): Try[Q[N]] = parseString(value)
+  protected def parse[N: SquantsNumeric](value: (N, String)): Try[Q[N]] = parseTuple(value._1, value._2)
 
-  private def parseString[N: SquantsNumeric](s: String): Try[Quantity[this.type, N]] = {
+  private def parseString[N: SquantsNumeric](s: String): Try[Q[N]] = {
     val sqNum = implicitly[SquantsNumeric[N]]
     s match {
-      case QuantityString(value, symbol) ⇒ sqNum.fromString(value) match {
+      case QuantityString(value, symbol) ⇒
+        sqNum.fromString(value) match {
         case Success(value) => Success(symbolToUnit(symbol).get(value))
         case Failure(error) => Failure(QuantityParseException(s"Unable to parse numeric", value, Some(error)))
       }
-      case _ ⇒ Failure(QuantityParseException(s"Unable to parse $name", s))
+      case x ⇒ Failure(QuantityParseException(s"Unable to parse $name", s))
     }
   }
 
-  private lazy val QuantityString = (".* *(" + units.map { u: UnitOfMeasure[this.type] ⇒ u.symbol }.reduceLeft(_ + "|" + _) + ")$").r
-  //  private lazy val QuantityString = ("^([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?) *(" + units.map { u: UnitOfMeasure[this.type] ⇒ u.symbol }.reduceLeft(_ + "|" + _) + ")$").r
+  private lazy val QuantityString = ("([\\S]+) *(" + units.map { u: UnitOfMeasure[this.type] ⇒ u.symbol }.reduceLeft(_ + "|" + _) + ")$").r
 
-  private def parseTuple[N: SquantsNumeric](value: N, symbol: String): Try[Quantity[this.type, N]] = {
+  private def parseTuple[N: SquantsNumeric](value: N, symbol: String): Try[Q[N]] = {
     symbolToUnit(symbol) match {
       case Some(unit) ⇒ Success(unit(value))
       case None ⇒ Failure(QuantityParseException(s"Unable to identify $name unit $symbol", (value, symbol).toString()))

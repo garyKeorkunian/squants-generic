@@ -2,9 +2,11 @@ package org.squants
 
 trait UnitOfMeasure[D <: Dimension] extends Serializable {
 
+  type Q[N] = D#Q[N]
+
   def symbol: String
 
-  def apply[N: SquantsNumeric](n: N): Quantity[D, N]
+  def apply[N: SquantsNumeric](value: N): Q[N]
 
   protected def converterTo[N]: (N, SquantsNumeric[N]) => N
   protected def converterFrom[N]: (N, SquantsNumeric[N]) => N
@@ -12,20 +14,20 @@ trait UnitOfMeasure[D <: Dimension] extends Serializable {
   /**
    * Converts a numeric to this UnitOfMeasure from the PrimaryUnit
    *
-   * @param n The numeric value to be converted
+   * @param value The numeric value to be converted
    * @tparam N The type of numeric - must have SquantsNumeric[N] in scope
    * @return The converted value
    */
-  final def convertTo[N: SquantsNumeric](n: N): N = converterTo(n, implicitly[SquantsNumeric[N]])
+  final def convertTo[N: SquantsNumeric](value: N): N = converterTo(value, implicitly[SquantsNumeric[N]])
 
   /**
    * Converts a numeric from this UnitOfMeasure to the PrimaryUnit
    *
-   * @param n The numeric value to be converted
+   * @param value The numeric value to be converted
    * @tparam N The type of numeric - must have SquantsNumeric[N] in scope
    * @return The converted value
    */
-  final def convertFrom[N: SquantsNumeric](n: N): N = converterFrom(n, implicitly[SquantsNumeric[N]])
+  final def convertFrom[N: SquantsNumeric](value: N): N = converterFrom(value, implicitly[SquantsNumeric[N]])
 
 }
 
@@ -47,12 +49,12 @@ trait SimpleConverter { self: UnitOfMeasure[_] =>
   protected implicit def conversionNumeric: SquantsNumeric[ConversionNumeric]
   def conversionFactor: ConversionNumeric
 
-  protected def converterTo[N]: (N, SquantsNumeric[N]) => N = { (n, sqNum) =>
-    sqNum.divide(n, sqNum.fromSquantsNumeric(conversionFactor))
+  protected def converterTo[N]: (N, SquantsNumeric[N]) => N = { (value, sqNum) =>
+    sqNum.divide(value, sqNum.fromSquantsNumeric(conversionFactor))
   }
 
-  protected def converterFrom[N]: (N, SquantsNumeric[N]) => N = { (n, sqNum) =>
-    sqNum.times(n, sqNum.fromSquantsNumeric(conversionFactor))
+  protected def converterFrom[N]: (N, SquantsNumeric[N]) => N = { (value, sqNum) =>
+    sqNum.times(value, sqNum.fromSquantsNumeric(conversionFactor))
   }
 
 }
@@ -64,8 +66,8 @@ trait SimpleConverter { self: UnitOfMeasure[_] =>
  */
 trait PrimaryUnit extends SimpleConverter { self: UnitOfMeasure[_] =>
   override final val conversionFactor: ConversionNumeric = conversionNumeric.one
-  protected override final def converterTo[N]: (N, SquantsNumeric[N]) => N = { (n, _) => n }
-  protected override final def converterFrom[N]: (N, SquantsNumeric[N]) => N = { (n, _) => n }
+  protected override final def converterTo[N]: (N, SquantsNumeric[N]) => N = { (value, _) => value }
+  protected override final def converterFrom[N]: (N, SquantsNumeric[N]) => N = { (value, _) => value }
 }
 
 // Market Traits

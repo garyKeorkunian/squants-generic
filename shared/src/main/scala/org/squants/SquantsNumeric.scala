@@ -10,7 +10,8 @@ trait SquantsNumeric[N] extends Ordering[N] {
   def times(a: N, b: N): N
   def divide(a: N, b: N): N
   def remainder(a: N, b: N): N
-  def divideAndRemainder(a: N, b: N): (N, N)
+  def divideAndRemainder(a: N, b: N): (N, N) = (divide(a, b), remainder(a, b))
+
   def negate(a: N): N
   def abs(a: N): N
 
@@ -24,22 +25,21 @@ trait SquantsNumeric[N] extends Ordering[N] {
 
   def fromDouble(a: Double): N
   def fromString(s: String): Try[N]
-  def fromSquantsNumeric[A](a: A)(implicit squantsNumeric: SquantsNumeric[A]): N
+  def fromSquantsNumeric[A: SquantsNumeric](a: A): N
 
   class Ops(lhs: N) {
-    def +(rhs: N): N = plus(lhs, rhs)
-    def -(rhs: N): N = minus(lhs, rhs)
-    def *(rhs: N): N = times(lhs, rhs)
-    def /(rhs: N): N = divide(lhs, rhs)
-    def %(rhs: N): N = remainder(lhs, rhs)
-    def /%(rhs: N): (N, N) = divideAndRemainder(lhs, rhs)
+    def +[R: SquantsNumeric](rhs: R): N = plus(lhs, fromSquantsNumeric(rhs))
+    def -[R: SquantsNumeric](rhs: R): N = minus(lhs, fromSquantsNumeric(rhs))
+    def *[R: SquantsNumeric](rhs: R): N = times(lhs, fromSquantsNumeric(rhs))
+    def /[R: SquantsNumeric](rhs: R): N = divide(lhs, fromSquantsNumeric(rhs))
+    def %[R: SquantsNumeric](rhs: R): N = remainder(lhs, fromSquantsNumeric(rhs))
+    def /%[R: SquantsNumeric](rhs: R): (N, N) = divideAndRemainder(lhs, fromSquantsNumeric(rhs))
     def unary_-(): N = negate(lhs)
-    def >(rhs: N): Boolean = gt(lhs, rhs)
-    def >=(rhs: N): Boolean = gteq(lhs, rhs)
-    def <(rhs: N): Boolean = lt(lhs, rhs)
-    def <=(rhs: N): Boolean = lteq(lhs, rhs)
+    def >[R: SquantsNumeric](rhs: R): Boolean = gt(lhs, fromSquantsNumeric(rhs))
+    def >=[R: SquantsNumeric](rhs: R): Boolean = gteq(lhs, fromSquantsNumeric(rhs))
+    def <[R: SquantsNumeric](rhs: R): Boolean = lt(lhs, fromSquantsNumeric(rhs))
+    def <=[R: SquantsNumeric](rhs: R): Boolean = lteq(lhs, fromSquantsNumeric(rhs))
   }
-
   implicit def mkSquantsNumericOps(lhs: N): Ops = new Ops(lhs)
 }
 
@@ -51,7 +51,6 @@ object SquantsNumeric {
     def times(a: Int, b: Int): Int = a * b
     def divide(a: Int, b: Int): Int = a / b
     def remainder(a: Int, b: Int): Int = a % b
-    def divideAndRemainder(a: Int, b: Int): (Int, Int) = a /% b
     def negate(a: Int): Int = -a
     def abs(a: Int): Int = math.abs(a)
     def zero = 0
@@ -63,7 +62,6 @@ object SquantsNumeric {
 
     def fromDouble(a: Double): Int = a.toInt
     def fromString(s: String): Try[Int] = Try {s.toInt}
-
     override def fromSquantsNumeric[A](a: A)(implicit squantsNumeric: SquantsNumeric[A]): Int = squantsNumeric.toInt(a)
   }
 
@@ -73,7 +71,6 @@ object SquantsNumeric {
     def times(a: Long, b: Long): Long = a * b
     def divide(a: Long, b: Long): Long = a / b
     def remainder(a: Long, b: Long): Long = a % b
-    def divideAndRemainder(a: Long, b: Long): (Long, Long) = a /% b
     def negate(a: Long): Long = -a
     def abs(a: Long): Long = math.abs(a)
     def zero = 0L
@@ -94,7 +91,6 @@ object SquantsNumeric {
     def times(a: Float, b: Float): Float = a * b
     def divide(a: Float, b: Float): Float = a / b
     def remainder(a: Float, b: Float): Float = a % b
-    def divideAndRemainder(a: Float, b: Float): (Float, Float) = a /% b
     def negate(a: Float): Float = -a
     def abs(a: Float): Float = math.abs(a)
     def zero = 0F
@@ -115,7 +111,6 @@ object SquantsNumeric {
     def times(a: Double, b: Double): Double = a * b
     def divide(a: Double, b: Double): Double = a / b
     def remainder(a: Double, b: Double): Double = a % b
-    def divideAndRemainder(a: Double, b: Double): (Double, Double) = a /% b
     def negate(a: Double): Double = -a
     def abs(a: Double): Double = math.abs(a)
     def zero = 0D
@@ -137,7 +132,6 @@ object SquantsNumeric {
     def times(a: BigDecimal, b: BigDecimal): BigDecimal = a * b
     def divide(a: BigDecimal, b: BigDecimal): BigDecimal = a / b
     def remainder(a: BigDecimal, b: BigDecimal): BigDecimal = a % b
-    def divideAndRemainder(a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
     def negate(a: BigDecimal): BigDecimal = -a
     def abs(a: BigDecimal): BigDecimal = a.abs
     def zero = BigDecimal(0)

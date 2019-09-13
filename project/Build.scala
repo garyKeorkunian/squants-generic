@@ -7,7 +7,7 @@ import com.typesafe.sbt.osgi.SbtOsgi
 import com.typesafe.sbt.osgi.SbtOsgi.autoImport._
 
 object Versions {
-  val Squants = "2.0.0-SNAPSHOT"
+  val Squants = "1.6.0-SNAPSHOT"
   val Scala = "2.11.12" // Don't use 2.12 yet to avoid troubles with native
   val scalaJSVersion =
     Option(System.getenv("SCALAJS_VERSION")).getOrElse("0.6.28")
@@ -254,7 +254,7 @@ object Docs {
     scalacOptions in (Compile, doc) ++= {
       val (bd, v) = ((baseDirectory in LocalRootProject).value, version.value)
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else "v" + v
-      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/typelevel/squants/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
+      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/garyKeorkunian/squants/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
     },
   )
 }

@@ -1,12 +1,13 @@
 package org.squants
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.squants.NumericRules.UseDeclaredType._
 
 import scala.util.Success
 
 
-class DimensionlessSpec extends FlatSpec with Matchers {
+class DimensionlessSpec extends AnyFlatSpec with Matchers {
 
   behavior of "DimensionlessSpec Code"
 

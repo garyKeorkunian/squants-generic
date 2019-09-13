@@ -18,4 +18,5 @@ package object squants {
       implicit object BigDecimalIsSquantsNumeric extends BigDecimalIsSquantsNumeric
     }
   }
+
 }
