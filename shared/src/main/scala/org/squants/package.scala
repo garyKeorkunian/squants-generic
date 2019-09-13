@@ -1,3 +1,9 @@
+/*                                                                      *\
+** Squants                                                              **
+**                                                                      **
+** (c) 2013-2019, Gary Keorkunian                                       **
+\*                                                                      */
+
 package org
 
 import org.squants.SquantsNumeric._

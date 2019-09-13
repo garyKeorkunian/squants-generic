@@ -5,6 +5,7 @@ This repo is an attempt to model a version of Squants that users a generic numer
 ## Goals
 
 * Create a model that supports generic numerics
+  * Support operations across different types of numerics
 
 * Minimize the impact to user code
   * Generic numerics must be able to be inferred
@@ -35,7 +36,7 @@ This repo is an attempt to model a version of Squants that users a generic numer
   
 * Implement QuantityRange and SVector
 
-* Add range and vector capabilities to Quantity class
+* Add range, vector and approximation capabilities to Quantity class
 
 * Implement a handful of other Dimensions
 

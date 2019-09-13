@@ -1,3 +1,9 @@
+/*                                                                      *\
+** Squants                                                              **
+**                                                                      **
+** (c) 2013-2019, Gary Keorkunian                                       **
+\*                                                                      */
+
 package org.squants
 
 import org.scalatest.flatspec.AnyFlatSpec

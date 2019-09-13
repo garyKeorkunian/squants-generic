@@ -1,3 +1,9 @@
+/*                                                                      *\
+** Squants                                                              **
+**                                                                      **
+** (c) 2013-2019, Gary Keorkunian                                       **
+\*                                                                      */
+
 package org.squants
 
 import org.squants.NumericRules.UseDouble.DoubleIsSquantsNumeric
@@ -5,7 +11,7 @@ import org.squants.NumericRules.UseDouble.DoubleIsSquantsNumeric
 import scala.util.Try
 
 final class Dimensionless[N: SquantsNumeric] private (val value: N, val unit: UnitOfMeasure[Dimensionless.type])
- extends Quantity[Dimensionless.type, N] {
+  extends Quantity[Dimensionless.type, N] {
 
   private lazy val sqNum = implicitly[SquantsNumeric[N]]
   import sqNum.mkSquantsNumericOps
@@ -64,5 +70,4 @@ object Gross extends DimensionlessUnit {
   val conversionFactor = 144D
   val symbol = "gr"
 }
-
 

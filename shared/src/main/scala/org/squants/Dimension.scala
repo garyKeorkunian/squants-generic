@@ -1,11 +1,18 @@
+/*                                                                      *\
+** Squants                                                              **
+**                                                                      **
+** (c) 2013-2019, Gary Keorkunian                                       **
+\*                                                                      */
+
 package org.squants
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 import scala.language.higherKinds
 
 trait Dimension {
 
+  // The numerically generic type for all Quantities of an implemented Dimension
   type Q[N] <: Quantity[this.type, N]
 
   /**
@@ -49,7 +56,7 @@ trait Dimension {
    * Tries to map a string or tuple value to Quantity of this Dimension
    *
    * @param value the source string (ie, "10 kW") or tuple (ie, (10, "kW"))
-   * @return Try[A]
+   * @return Try[Q[N]
    */
   protected def parse[N: SquantsNumeric](value: String): Try[Q[N]] = parseString(value)
   protected def parse[N: SquantsNumeric](value: (N, String)): Try[Q[N]] = parseTuple(value._1, value._2)
@@ -59,9 +66,9 @@ trait Dimension {
     s match {
       case QuantityString(value, symbol) ⇒
         sqNum.fromString(value) match {
-        case Success(value) => Success(symbolToUnit(symbol).get(value))
-        case Failure(error) => Failure(QuantityParseException(s"Unable to parse numeric", value, Some(error)))
-      }
+          case Success(value) ⇒ Success(symbolToUnit(symbol).get(value))
+          case Failure(error) ⇒ Failure(QuantityParseException(s"Unable to parse numeric", value, Some(error)))
+        }
       case x ⇒ Failure(QuantityParseException(s"Unable to parse $name", s))
     }
   }
@@ -71,7 +78,7 @@ trait Dimension {
   private def parseTuple[N: SquantsNumeric](value: N, symbol: String): Try[Q[N]] = {
     symbolToUnit(symbol) match {
       case Some(unit) ⇒ Success(unit(value))
-      case None ⇒ Failure(QuantityParseException(s"Unable to identify $name unit $symbol", (value, symbol).toString()))
+      case None       ⇒ Failure(QuantityParseException(s"Unable to identify $name unit $symbol", (value, symbol).toString()))
     }
   }
 }
