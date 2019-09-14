@@ -15,7 +15,7 @@ This repo is an attempt to model a version of Squants that uses a generic numeri
 ```scala
     val p = Kilowatts(12.34) // should result in Power[Double], which is the effective type in Squants 1.x
 ```
-    * Should this to default all numerics to Double for backwards compatability?
+  * Should this to default all numerics to Double for backwards compatability?
 ```scala
     val p = Kilowatts(12) // should be this be Power[Int] or Power[Double]?
 ```
@@ -28,7 +28,7 @@ This repo is an attempt to model a version of Squants that uses a generic numeri
     val p: Power = Load(12.34)
 ```
 
-    must be changed to
+must be changed to
 
 ```scala
     val p: Power[Double] = Load(12.34)
@@ -62,12 +62,24 @@ This repo is an attempt to model a version of Squants that uses a generic numeri
     trait BigDecimalIsSquantsNumeric extends SquantsNumeric[BigDecimal]
   
     // Quantity Domain
-    trait Dimension // e.g, Mass, Length, Time, etc
-    trait UnitOfMeasure[D <: Dimension] // e.g., Kilogram, Meter, Second, etc
+    trait Dimension 
+    trait UnitOfMeasure[D <: Dimension] 
     abstract class Quantity[D <: Dimension, N: SquantsNumeric] {
       def value: N
       def unit: UnitOfMeasure[D]
-    } // 10 Kilograms, 20 Meters, 30 Seconds
+    } 
+
+    // Example Dimension
+    object Mass extends Dimension
+
+    trait MassUnit extends UnitOfMeasure[Mass.type]
+
+    object Kilogram extends MassUnit
+    object Gram extends MassUnit
+
+    final class Mass[N: SquantsNumeric](val value: N, val unit: UnitOfMeasure[Mass.type])
+      extends Quantity[Mass.type, N]
+
 ```
 
 * Enough of the Quantity code has been implemented to prove out the concept

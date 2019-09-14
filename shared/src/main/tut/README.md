@@ -62,12 +62,24 @@ must be changed to
     trait BigDecimalIsSquantsNumeric extends SquantsNumeric[BigDecimal]
   
     // Quantity Domain
-    trait Dimension // e.g, Mass, Length, Time, etc
-    trait UnitOfMeasure[D <: Dimension] // e.g., Kilogram, Meter, Second, etc
+    trait Dimension 
+    trait UnitOfMeasure[D <: Dimension] 
     abstract class Quantity[D <: Dimension, N: SquantsNumeric] {
       def value: N
       def unit: UnitOfMeasure[D]
-    } // 10 Kilograms, 20 Meters, 30 Seconds
+    } 
+
+    // Example Dimension
+    object Mass extends Dimension
+
+    trait MassUnit extends UnitOfMeasure[Mass.type]
+
+    object Kilogram extends MassUnit
+    object Gram extends MassUnit
+
+    final class Mass[N: SquantsNumeric](val value: N, val unit: UnitOfMeasure[Mass.type])
+      extends Quantity[Mass.type, N]
+
 ```
 
 * Enough of the Quantity code has been implemented to prove out the concept
