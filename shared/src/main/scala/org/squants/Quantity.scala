@@ -15,7 +15,7 @@ abstract class Quantity[D <: Dimension, N: SquantsNumeric]
   type Q[A] = D#Q[A] // A like quantity with a Generic numeric
   type QN = Q[N] // A like quantity with a like numeric
 
-  private val sqNum = implicitly[SquantsNumeric[N]]
+  protected val sqNum: SquantsNumeric[N] = implicitly[SquantsNumeric[N]]
   import sqNum.mkSquantsNumericOps
 
   def value: N
@@ -80,5 +80,5 @@ abstract class Quantity[D <: Dimension, N: SquantsNumeric]
   def toTuple: (N, String) = (value, unit.symbol)
   def toTuple(uom: UnitOfMeasure[D]): (N, String) = (to(uom), uom.symbol)
 
-  // TODO Implement QuantityRange capabilities
+  // TODO Implement QuantityRange and Approximation capabilities
 }

@@ -12,6 +12,9 @@ import scala.language.higherKinds
 
 trait Dimension {
 
+  // The type for units of an implemented Dimension
+  type U <: UnitOfMeasure[this.type]
+
   // The numerically generic type for all Quantities of an implemented Dimension
   type Q[N] <: Quantity[this.type, N]
 
@@ -27,7 +30,7 @@ trait Dimension {
    *
    * @return
    */
-  def units: Set[UnitOfMeasure[this.type]]
+  def units: Set[U]
 
   /**
    * The unit with a conversions factor of 1.
@@ -35,14 +38,14 @@ trait Dimension {
    *
    * @return
    */
-  def primaryUnit: UnitOfMeasure[this.type]
+  def primaryUnit: U
 
   /**
    * The International System of Units (SI) Base Unit
    *
    * @return
    */
-  def siUnit: UnitOfMeasure[this.type] with SiUnit
+  def siUnit: U with SiUnit
 
   /**
    * Maps a string representation of a unit symbol into the matching UnitOfMeasure object
@@ -50,7 +53,12 @@ trait Dimension {
    * @param symbol String
    * @return
    */
-  def symbolToUnit(symbol: String): Option[UnitOfMeasure[this.type]] = units.find(u ⇒ u.symbol == symbol)
+  def symbolToUnit(symbol: String): Option[U] = units.find(u ⇒ u.symbol == symbol)
+
+  def apply[N: SquantsNumeric](value: N, unit: U): Q[N]
+
+  def apply[N: SquantsNumeric](s: String): Try[Q[N]] = parse[N](s)
+  def apply[N: SquantsNumeric](t: Tuple2[N, String]): Try[Q[N]] = parse[N](t)
 
   /**
    * Tries to map a string or tuple value to Quantity of this Dimension
@@ -73,7 +81,7 @@ trait Dimension {
     }
   }
 
-  private lazy val QuantityString = ("([\\S]+) *(" + units.map { u: UnitOfMeasure[this.type] ⇒ u.symbol }.reduceLeft(_ + "|" + _) + ")$").r
+  private lazy val QuantityString = ("([\\S]+) *(" + units.map { u: U ⇒ u.symbol }.reduceLeft(_ + "|" + _) + ")$").r
 
   private def parseTuple[N: SquantsNumeric](value: N, symbol: String): Try[Q[N]] = {
     symbolToUnit(symbol) match {

@@ -6,6 +6,8 @@
 
 package org.squants
 
+import org.squants.NumericRules.UseDeclaredType.DoubleIsSquantsNumeric
+
 trait UnitOfMeasure[D <: Dimension] extends Serializable {
 
   type Q[N] = D#Q[N]
@@ -51,8 +53,10 @@ trait UnitOfMeasure[D <: Dimension] extends Serializable {
  */
 trait SimpleConverter { self: UnitOfMeasure[_] ⇒
 
-  type ConversionNumeric
-  protected implicit def conversionNumeric: SquantsNumeric[ConversionNumeric]
+  // Double provided as default, can be overridden in each unit / unit group
+  type ConversionNumeric = Double
+  protected implicit def conversionNumeric: SquantsNumeric[ConversionNumeric] = DoubleIsSquantsNumeric
+
   def conversionFactor: ConversionNumeric
 
   protected def converterTo[N]: (N, SquantsNumeric[N]) ⇒ N = { (value, sqNum) ⇒
