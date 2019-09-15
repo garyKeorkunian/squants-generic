@@ -21,7 +21,7 @@ abstract class Quantity[D <: Dimension, N: SquantsNumeric]
   def value: N
   def unit: UnitOfMeasure[D]
 
-  def map[A: SquantsNumeric](f: N ⇒ A): Q[A] = unit.apply[A](f(value))
+  @inline def map[B: SquantsNumeric](f: N ⇒ B): Q[B] = unit.apply(f(value))
 
   def to(otherUnit: UnitOfMeasure[D]): N = otherUnit match {
     case u if u == this.unit ⇒ value

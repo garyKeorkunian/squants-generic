@@ -7,22 +7,17 @@
 package org
 
 import org.squants.SquantsNumeric._
+import scala.language.implicitConversions
 
 package object squants {
 
-  object NumericRules {
+  implicit object DoubleIsSquantsNumeric extends DoubleIsSquantsNumeric
+  implicit def NumericToDouble[A: Numeric](a: A): Double = implicitly[Numeric[A]].toDouble(a)
 
-    object UseDouble {
-      implicit object DoubleIsSquantsNumeric extends DoubleIsSquantsNumeric
-    }
-
-    object UseDeclaredType {
-      implicit object IntIsSquantsNumeric extends IntIsSquantsNumeric
+    object AllNumerics {
       implicit object LongIsSquantsNumeric extends LongIsSquantsNumeric
       implicit object FloatIsSquantsNumeric extends FloatIsSquantsNumeric
-      implicit object DoubleIsSquantsNumeric extends DoubleIsSquantsNumeric
+      implicit object IntIsSquantsNumeric extends IntIsSquantsNumeric
       implicit object BigDecimalIsSquantsNumeric extends BigDecimalIsSquantsNumeric
     }
-  }
-
 }

@@ -38,7 +38,8 @@ trait SquantsNumeric[N] extends Ordering[N] {
   def toLong(a: N): Long
   def toFloat(a: N): Float
   def toDouble(a: N): Double
-  def fromDouble(a: Double): N
+
+//  def fromDouble(a: Double): N
   def fromString(s: String): Try[N]
   def fromSquantsNumeric[A: SquantsNumeric](a: A): N
 

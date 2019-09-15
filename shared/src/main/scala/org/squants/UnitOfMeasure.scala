@@ -6,8 +6,6 @@
 
 package org.squants
 
-import org.squants.NumericRules.UseDeclaredType.DoubleIsSquantsNumeric
-
 trait UnitOfMeasure[D <: Dimension] extends Serializable {
 
   type Q[N] = D#Q[N]

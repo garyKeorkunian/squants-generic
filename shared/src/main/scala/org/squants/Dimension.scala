@@ -75,7 +75,8 @@ trait Dimension {
       case QuantityString(value, symbol) ⇒
         sqNum.fromString(value) match {
           case Success(value) ⇒ Success(symbolToUnit(symbol).get(value))
-          case Failure(error) ⇒ Failure(QuantityParseException(s"Unable to parse numeric", value, Some(error)))
+          case Failure(error) ⇒ Failure(QuantityParseException(s"Unable to parse numeric", value))
+
         }
       case x ⇒ Failure(QuantityParseException(s"Unable to parse $name", s))
     }
@@ -91,7 +92,7 @@ trait Dimension {
   }
 }
 
-case class QuantityParseException(message: String, expression: String, cause: Option[Throwable] = None) extends Exception
+case class QuantityParseException(message: String, expression: String) extends Exception
 
 /**
  * SI Base Quantity

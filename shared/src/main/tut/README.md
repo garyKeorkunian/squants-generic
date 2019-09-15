@@ -85,7 +85,8 @@ must be changed to
 * Enough of the Quantity code has been implemented to prove out the concept
 
 * The Dimensionless type has been implemented as a first vetting example
-  * DimensionlessSpec passes as is - a promising sign
+  * Most DimensionlessSpec tests pass as is - a promising sign - however, I am finding things some things that will need to be more explicit in user code
+  
   
 ## Next Steps
 
