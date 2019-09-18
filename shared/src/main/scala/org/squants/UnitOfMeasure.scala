@@ -13,6 +13,7 @@ trait UnitOfMeasure[D <: Dimension] extends Serializable {
   def symbol: String
 
   def apply[N: SquantsNumeric](value: N): Q[N]
+  def apply(value: Double): Q[Double]
 
   protected def converterTo[N]: (N, SquantsNumeric[N]) ⇒ N
   protected def converterFrom[N]: (N, SquantsNumeric[N]) ⇒ N

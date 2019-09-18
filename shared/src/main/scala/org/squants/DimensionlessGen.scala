@@ -6,12 +6,12 @@
 
 package org.squants
 
-final class Dimensionless[N: SquantsNumeric] private (val value: N, val unit: UnitOfMeasure[Dimensionless.type])
-  extends Quantity[Dimensionless.type, N] {
+final class DimensionlessGen[N: SquantsNumeric] private (val value: N, val unit: UnitOfMeasure[DimensionlessGen.type])
+  extends Quantity[DimensionlessGen.type, N] {
 
   import sqNum.mkSquantsNumericOps
 
-  def *[A: SquantsNumeric](that: Dimensionless[A]): Dimensionless[N] = map(_ * that.toEach)
+  def *[A: SquantsNumeric](that: DimensionlessGen[A]): DimensionlessGen[N] = map(_ * that.toEach)
 
   // this is an exception to the general rule in that the numeric type of the right side is kept
   // this exception exists because it is consistent with the right side dimension/unit being kept as well.
@@ -27,20 +27,22 @@ final class Dimensionless[N: SquantsNumeric] private (val value: N, val unit: Un
   def toGross: N = to(Gross)
 }
 
-object Dimensionless extends Dimension {
+object DimensionlessGen extends Dimension {
   override type U = DimensionlessUnit
-  override type Q[N] = Dimensionless[N]
+  override type Q[N] = DimensionlessGen[N]
 
   val name: String = "Dimensionless"
   val primaryUnit: U = Each
   val siUnit: U with SiUnit = Each
   val units: Set[U] = Set(Each, Percent, Dozen, Score, Gross)
 
-  def apply[N: SquantsNumeric](n: N, unit: DimensionlessUnit) = new Dimensionless(n, unit)
+  def apply[N: SquantsNumeric](n: N, unit: DimensionlessUnit) = new DimensionlessGen[N](n, unit)
+  def apply(n: Double, unit: DimensionlessUnit): DimensionlessGen[Double] = apply[Double](n, unit)(DoubleIsSquantsNumeric)
 }
 
-trait DimensionlessUnit extends UnitOfMeasure[Dimensionless.type] with SimpleConverter {
-  override def apply[N: SquantsNumeric](value: N): Dimensionless[N] = Dimensionless(value, this)
+trait DimensionlessUnit extends UnitOfMeasure[DimensionlessGen.type] with SimpleConverter {
+  override def apply[N: SquantsNumeric](value: N): DimensionlessGen[N] = DimensionlessGen(value, this)
+  override def apply(value: Double): DimensionlessGen[Double] = apply[Double](value)
 }
 
 object Each extends DimensionlessUnit with PrimaryUnit with SiUnit {
@@ -68,30 +70,29 @@ object Gross extends DimensionlessUnit {
 }
 
 object DimensionlessConversions {
-  import AllNumerics._
 
-  lazy val percent: Dimensionless[Int] = Percent(1)
-  lazy val each: Dimensionless[Int] = Each(1)
-  lazy val dozen: Dimensionless[Int] = Dozen(1)
-  lazy val score: Dimensionless[Int] = Score(1)
-  lazy val gross: Dimensionless[Int] = Gross(1)
-  lazy val hundred: Dimensionless[Long] = Each(100L)
-  lazy val thousand: Dimensionless[Long] = Each(1000L)
-  lazy val million: Dimensionless[Long] = Each(1000000L)
+  lazy val percent: DimensionlessGen[Int] = Percent(1)
+  lazy val each: DimensionlessGen[Int] = Each(1)
+  lazy val dozen: DimensionlessGen[Int] = Dozen(1)
+  lazy val score: DimensionlessGen[Int] = Score(1)
+  lazy val gross: DimensionlessGen[Int] = Gross(1)
+  lazy val hundred: DimensionlessGen[Long] = Each(100L)
+  lazy val thousand: DimensionlessGen[Long] = Each(1000L)
+  lazy val million: DimensionlessGen[Long] = Each(1000000L)
 
   implicit class DimensionlessConversions[N](n: N)(implicit sqNum: SquantsNumeric[N]) {
     import sqNum.mkSquantsNumericOps
-    def percent: Dimensionless[N] = Percent(n)
-    def each: Dimensionless[N] = Each(n)
-    def ea: Dimensionless[N] = Each(n)
-    def dozen: Dimensionless[N] = Dozen(n)
-    def dz: Dimensionless[N] = Dozen(n)
-    def score: Dimensionless[N] = Score(n)
-    def gross: Dimensionless[N] = Gross(n)
-    def gr: Dimensionless[N] = Gross(n)
-    def hundred: Dimensionless[N] = Each(n * 100L)
-    def thousand: Dimensionless[N] = Each(n * 1000L)
-    def million: Dimensionless[N] = Each(n * 1000000L)
+    def percent: DimensionlessGen[N] = Percent(n)
+    def each: DimensionlessGen[N] = Each(n)
+    def ea: DimensionlessGen[N] = Each(n)
+    def dozen: DimensionlessGen[N] = Dozen(n)
+    def dz: DimensionlessGen[N] = Dozen(n)
+    def score: DimensionlessGen[N] = Score(n)
+    def gross: DimensionlessGen[N] = Gross(n)
+    def gr: DimensionlessGen[N] = Gross(n)
+    def hundred: DimensionlessGen[N] = Each(n * 100L)
+    def thousand: DimensionlessGen[N] = Each(n * 1000L)
+    def million: DimensionlessGen[N] = Each(n * 1000000L)
   }
 
 
@@ -104,8 +105,10 @@ object DimensionlessConversions {
 //   * @param d Dimensionless
 //   * @return
 //   */
-//    import scala.language.implicitConversions
+    import scala.language.implicitConversions
 //    implicit def dimensionlessToDouble(d: Dimensionless): Double = d.toEach
+
+    implicit def dimensionlessToNumeric[N: SquantsNumeric](d: DimensionlessGen[N]): N = d.toEach
 //
 //  implicit object DimensionlessNumeric extends AbstractQuantityNumeric[Dimensionless](Dimensionless.primaryUnit) {
 //    /**

@@ -8,14 +8,12 @@ package org.squants
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import scala.util.Success
 
-// 2.0 NOTE - Need all SquantsNumeric typeclasses for these tests
-import AllNumerics._
+import scala.util.{Success, Try}
 
-class DimensionlessSpec extends AnyFlatSpec with Matchers {
+class DimensionlessDoubleSpec extends AnyFlatSpec with Matchers {
 
-  behavior of "DimensionlessSpec Code"
+  behavior of "Dimensionless and its Units of Measure"
 
   it should "create values using UOM factories" in {
     Percent(1).toPercent should be(1)
@@ -25,7 +23,7 @@ class DimensionlessSpec extends AnyFlatSpec with Matchers {
     Gross(1).toGross should be(1)
   }
 
-  // 2.0 - NOTE - When parsing a numeric String, the SquantsNumeric Type must be explicit
+  // 2.0 - Needed to add [Double] type argument for string constructor
   it should "create values from properly formatted Strings" in {
     Dimensionless[Double]("10.22 %").get should be(Percent(10.22))
     Dimensionless[Double]("10.22 ea").get should be(Each(10.22))
@@ -36,8 +34,15 @@ class DimensionlessSpec extends AnyFlatSpec with Matchers {
     Dimensionless[Double]("zz ea").failed.get should be(QuantityParseException("Unable to parse numeric", "zz"))
   }
 
+    // 2.0 - Extra check
+  it should "create a SquantsDouble.Dimensionless when type is declared without supplying Numeric parameter" in {
+    import org.squants.SquantsDouble.Dimensionless
+    val typedVal: Try[Dimensionless] = Dimensionless("10.22 %")
+    typedVal.get should be(Percent(10.22))
+  }
+
   it should "properly convert to all supported Units of Measure" in {
-    val x = Gross(1.0)
+    val x = Gross(1)
     x.toPercent should be(14400)
     x.toEach should be(144)
     x.toDozen should be(12)
@@ -46,11 +51,11 @@ class DimensionlessSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "return properly formatted strings for all supported Units of Measure" in {
-    Percent(1).toString(Percent) should be("1 %")
-    Each(1).toString(Each) should be("1 ea")
-    Dozen(1).toString(Dozen) should be("1 dz")
-    Score(1).toString(Score) should be("1 score")
-    Gross(1).toString(Gross) should be("1 gr")
+    Percent(1).toString(Percent) should be("1.0 %")
+    Each(1).toString(Each) should be("1.0 ea")
+    Dozen(1).toString(Dozen) should be("1.0 dz")
+    Score(1).toString(Score) should be("1.0 score")
+    Gross(1).toString(Gross) should be("1.0 gr")
   }
 
   it should "return another Dimensionless when multiplied by a Dimensionless" in {
@@ -58,11 +63,10 @@ class DimensionlessSpec extends AnyFlatSpec with Matchers {
     Dozen(5) * Percent(10) should be(Each(6))
   }
 
-  // TODO - Resolve Dimensionless.+ => Quantity.+ conflict
 //  it should "return another Dimensionless when added to a Double" in {
 //    Each(10) + 10.22 should be(Each(20.22))
 //  }
-
+//
 //  it should "return a Frequency when divided by Time" in {
 //    Each(60) / Seconds(1) should be(Hertz(60))
 //  }
@@ -103,44 +107,46 @@ class DimensionlessSpec extends AnyFlatSpec with Matchers {
     coefficient.million should be(Each(coefficient * 1e6))
   }
 
-  // TODO - Reenable this functionality
-//  it should "provide an implicit conversion to Double" in {
-//    import DimensionlessConversions._
-//
-//    10 + 5.each should be(15d)
-//    100 - 1.dozen should be(88d)
-//    100 * 15.percent should be(15)
-//    12000 / 1.dozen should be(1000d)
-//  }
-//
+  it should "provide an implicit conversion to Double" in {
+    import DimensionlessConversions._
+
+    10 + 5.each should be(15d)
+    100 - 1.dozen should be(88d)
+    100 * 15.0.percent should be(15)  // 2.0 Needed to make that percent a Double
+    12000 / 1.dozen should be(1000d)
+  }
+
 //  it should "provide Numeric support" in {
 //    import DimensionlessConversions.DimensionlessNumeric
 //
 //    // The `times` operation is allowed for Dimensionless quantities
 //    DimensionlessNumeric.times(Each(10), Dozen(3)) should be(Dozen(30))
 //  }
+}
 
-  // 2.0 NOTE - These tests for new and could be moved to QuantitySpec
+class DimensionlessGenSpec extends AnyFlatSpec with Matchers {
 
-  it should "create an Int based Quantity as previously" in {
-    val x = Each(10)
+  behavior of "DimensionlessGenSpec Code"
+
+  it should "create an Int based Quantity" in {
+    val x = Each[Int](10)
     x.toEach should be(10)
     x.toEach shouldBe an[Int]
   }
 
-  it should "create a Long based Quantity as previously" in {
-    val x = Each(10L)
+  it should "create a Long based Quantity" in {
+    val x = Each[Long](10L)
     x.toEach should be(10L)
     x.toEach shouldBe a[Long]
   }
 
-  it should "create a Float based Quantity as previously" in {
-    val x = Each(10.22F)
+  it should "create a Float based Quantity" in {
+    val x = Each[Float](10.22F)
     x.toEach should be(10.22F)
     x.toEach shouldBe a[Float]
   }
 
-  it should "create a Double based Quantity as previously" in {
+  it should "create a Double based Quantity" in {
     val x = Each(10.22)
     x.toEach should be(10.22)
     x.toEach shouldBe a[Double]
@@ -163,6 +169,12 @@ class DimensionlessSpec extends AnyFlatSpec with Matchers {
     Dimensionless((10.22F, "ea")) should be(Success(Each(10.22F)))
     Dimensionless((10L, "ea")) should be(Success(Each(10L)))
     Dimensionless((10, "ea")) should be(Success(Each(10)))
+  }
+
+  it should "create a SquantsGeneric.Dimensionless when type is declared without supplying Numeric parameter" in {
+    import org.squants.SquantsGeneric.Dimensionless
+    val typedVal: Try[Dimensionless[BigDecimal]] = Dimensionless("10.22 %")
+    typedVal.get should be(Percent(BigDecimal(10.22)))
   }
 
   it should "add two Quantities that are based on the same numeric type" in {

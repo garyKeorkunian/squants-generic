@@ -56,6 +56,7 @@ trait Dimension {
   def symbolToUnit(symbol: String): Option[U] = units.find(u ⇒ u.symbol == symbol)
 
   def apply[N: SquantsNumeric](value: N, unit: U): Q[N]
+  def apply(value: Double, unit: U): Q[Double]
 
   def apply[N: SquantsNumeric](s: String): Try[Q[N]] = parse[N](s)
   def apply[N: SquantsNumeric](t: Tuple2[N, String]): Try[Q[N]] = parse[N](t)
