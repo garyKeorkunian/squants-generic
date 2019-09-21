@@ -82,7 +82,7 @@ must be changed to
     object Kilogram extends MassUnit
     object Gram extends MassUnit
 
-    final class Mass[N: SquantsNumeric](val value: N, val unit: UnitOfMeasure[Mass.type])
+    final class MassGen[N: SquantsNumeric](val value: N, val unit: UnitOfMeasure[Mass.type])
       extends Quantity[Mass.type, N]
 
 ```
