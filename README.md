@@ -49,6 +49,11 @@ must be changed to
   * Dimension is now the root type of the model - No Longer Quantity
   * UnitOfMeasure is now typed on Dimension
   * Quantity is now typed on Dimension and N: SquantsNumeric
+  * Enough of the Quantity code has been implemented to prove out the concept
+  
+  * The Dimensionless type has been implemented as a first vetting example
+    * Most DimensionlessSpec tests pass as is - a promising sign - however, I am finding things some things that will need to be more explicit in user code
+    
   
 ```scala
     // Abbreviated Model
@@ -82,11 +87,77 @@ must be changed to
 
 ```
 
-* Enough of the Quantity code has been implemented to prove out the concept
+The following is an example of using Units to create Quantities
 
-* The Dimensionless type has been implemented as a first vetting example
-  * Most DimensionlessSpec tests pass as is - a promising sign - however, I am finding things some things that will need to be more explicit in user code
-  
+Creating overloadeds version of the UnitOfMeaure.apply allows for backwards compatibility with 1.x and
+explicit numeric typing when a user is ready to use it.
+
+```scala
+import org.squants._
+
+// The following code is 1.x compatible and generates the same result - a quantity with a Double value
+val nd = Each(10)        // DimensionlessGen[Double] = 10.0 ea
+
+val ld = Each(10L)       // DimensionlessGen[Double] = 10.0 ea
+
+val fd = Each(10.22f)    // DimensionlessGen[Double] = 10.220000267028809 ea
+
+val dd = Each(10.22)     // DimensionlessGen[Double] = 10.22 ea
+
+val ddd = Each(10.22d)    // DimensionlessGen[Double] = 10.22 ea
+
+// This statement is allowed in 1.x, but the BigDecimal is actually converted to a Double
+// In 2.x the BigDecimal is preserved.  
+// If a user did this, I suspect this would be a desired in change behavior
+val bd = Each(BigDecimal(10.22)) // DimensionlessGen[scala.math.BigDecimal] = 10.22 ea
+
+// This is new for 2.x.  Specifying a type argument results in a quantity with a value of that type
+val n = Each[Int](10)   // DimensionlessGen[Int] = 10 ea
+
+val l = Each[Long](10)  // DimensionlessGen[Long] = 10 ea
+
+val f = Each[Float](10.22f) // DimensionlessGen[Float] = 10.22 ea
+
+val d = Each[Double](10.22) // DimensionlessGen[Double] = 10.22 ea   
+
+val a = Each[BigDecimal](10.22)  // DimensionlessGen[BigDecimal] = 10.22 ea
+
+// Of course, the argument must match the type
+ 
+// This code is not backward compitable, because it assumed parsing a Double
+val s1 = Dimensionless("10.22")
+
+// In 2.x string parsers must know what type of numeric they are attempting to parse
+val s2 = Dimensionless[Double]("10.22")
+
+```
+
+Where explicit Quantity types will be used, you can use *Quantity*Gen (e.g DimensionlessGen) directly,
+or import type aliases.
+
+Importing squants.SquantsDouble._ provides type aliases that provide backward compatibility with 1.x
+
+```scala
+import org.squants.SquantsDouble._
+
+def d: Dimensionless // DimensionlessGen[Double]
+
+```
+
+Importing squants.SquantsGeneric._ provides type aliases that are generic and require a type parameter
+
+```scala
+import org.squants.SquantsGeneric._
+
+def bd: Dimensionless[BigDecimal]
+def n: Dimensionless[Int]
+
+```
+
+Additional imports can also be created (e.g. SquantsBigDecimal, SquantsSpireRational, etc.).
+And, of course, users can create their own to identify which numeric they want for each dimension.
+
+
   
 ## Next Steps
 
